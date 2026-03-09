@@ -1,7 +1,6 @@
 #define SDL_MAIN_USE_CALLBACKS 1
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 
@@ -14,7 +13,6 @@ const char* version = "0.2";
 
 char *text_buffer;
 const int n_text_buffer = 1024;
-
 
 SDL_AppResult SDL_AppInit (void **appstate, int argc, char *argv[]) {
   SDL_SetAppMetadata(title, version, NULL);
@@ -34,12 +32,10 @@ SDL_AppResult SDL_AppInit (void **appstate, int argc, char *argv[]) {
     return SDL_APP_FAILURE;
   }
   
-  srand(13357);
-
-  text_buffer = malloc(n_text_buffer);
+  text_buffer = SDL_malloc(n_text_buffer);
   app->n_objects = 3;
   app->capacity = 2 * app->n_objects;
-  app->universe = calloc(sizeof *app->universe, app->capacity);
+  app->universe = SDL_calloc(sizeof *app->universe, app->capacity);
   app->gravity = 2.5;
   app->t = 0;
   app->dt= 0.001;
@@ -127,7 +123,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     if (app->n_objects == app->capacity) {
       Object *temp = app->universe;
       unsigned new_cap = app->capacity * 3 / 2;
-      app->universe = realloc(app->universe, new_cap * sizeof *app->universe);
+      app->universe = SDL_realloc(app->universe, new_cap * sizeof *app->universe);
       if (app->universe == NULL) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "failed allocating space for new planet");
         app->universe = temp;
@@ -169,7 +165,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
 void SDL_AppQuit(void *appstate, SDL_AppResult result) {
   AppState *app = appstate;
-  free(app->universe);
-  free(text_buffer);
+  SDL_free(app->universe);
+  SDL_free(text_buffer);
   SDL_free(app);
 }
