@@ -105,8 +105,7 @@ void render_diagnostics(AppState *app) {
   SDL_SetRenderDrawColor(app->renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
   
   Vec2 com = centre_of_mass(app);
-  SDL_RenderPoint(
-    app->renderer,
+  SDL_RenderPoint(app->renderer,
     com.x * app->scale + app->WIDTH / 2,
     com.y * app->scale + app->HEIGHT / 2
   );
