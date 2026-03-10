@@ -1,1 +1,0 @@
-gcc gravity.c -o gravity -I SDL3-3.4.2/x86_64-w64-mingw32/include -L SDL3-3.4.2/x86_64-w64-mingw32/lib -lSDL3 -mwindows

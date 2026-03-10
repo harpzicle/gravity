@@ -25,16 +25,49 @@ Vec2 pos_to_render(AppState *app, Vec2 pos) {
   return render;
 }
 
-SDL_FRect render_position(AppState *app, Object obj) {
-  SDL_FRect ans;
-  ans.x = obj.r.x * app->scale + app->WIDTH / 2;
-  ans.y = obj.r.y * app->scale + app->HEIGHT / 2;
+int in_rect(Vec2 pos, Vec2 rect) {
+  return (pos.x < rect.x && pos.x > 0 && pos.y < rect.x && pos.y > 0);
+}
 
+Vec2 frame_clip(Vec2 pos, float s, float w, float h) {
+  // project a particle outside the screen onto the edge
+  s /= 2;
+  if (pos.x > s && pos.y > s && pos.x < w-s &&  pos.y < h-s)
+    return pos;
+
+  double t = (s - h/2) / (pos.y - h/2);
+  Vec2 bottom = (Vec2) {w/2 - (pos.x-w/2)*t, h-s};
+  Vec2 top = (Vec2) {w/2 + (pos.x-w/2)*t, s};
+
+  t = (s - w/2) / (pos.x - w/2);
+  Vec2 left = (Vec2) {s, h/2 + (pos.y-h/2)*t};
+  Vec2 right = (Vec2) {w-s, h/2 - (pos.y-h/2)*t};
+
+  if (pos.x <= s) {
+    return (left.y < s) ? top : (left.y > h-s) ? bottom : left;
+  }
+  if (pos.x >= w-s) {
+    return (right.y < s) ? top : (right.y > h-s) ? bottom : right;
+  }
+  if (pos.y <= s) {
+    return (top.x < s) ? left : (top.x > w-s) ? right : top;
+  }
+  if (pos.y >= h-s) {
+    return (bottom.x < s) ? left : (bottom.x > w-s) ? right : bottom;
+  }
+}
+
+SDL_FRect render_position(AppState *app, Object obj) {
+  Vec2 pos = frame_clip(pos_to_render(app, obj.r), obj.s, app->WIDTH, app->HEIGHT);
+  SDL_FRect ans;
+  ans.x = pos.x - obj.s/2;
+  ans.y = pos.y - obj.s/2;
   ans.w = obj.s;
   ans.h = obj.s;
 
   return ans;
 }
+
 
 void render_objects(AppState *app) {
   SDL_SetRenderDrawColor(app->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);

@@ -139,6 +139,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     new_obj->a = (Vec2) {0, 0};
     new_obj->m = 0.1;
     new_obj->s = 3.;
+    new_obj->c = (SDL_FColor){255, 255, 0, SDL_ALPHA_OPAQUE}; 
 
   }
   if (event->type == SDL_EVENT_MOUSE_BUTTON_UP && event->button.button == SDL_BUTTON_LEFT) {
