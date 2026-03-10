@@ -150,6 +150,15 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     app->universe[app->n_objects].v = (Vec2) {vx, vy};
     app->n_objects++;
   }
+
+  if (event->type == SDL_EVENT_MOUSE_WHEEL) {
+    int up = event->wheel.y * ( event->wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1 : 1 );
+    if (up > 0) {
+      app->scale *= 1.5;
+    } else if (up < 0) {
+      app->scale /= 1.5;
+    }
+  }
   
   return SDL_APP_CONTINUE;
 }

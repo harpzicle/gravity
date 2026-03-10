@@ -116,13 +116,14 @@ void render_diagnostics(AppState *app) {
 
   render_linef(app, 0, 0, "[/] Timestep: %.2g", app->dt);
   render_linef(app, 0, 1, "P Paused: %s", "Yes\0No" + 4*app->running);
-  render_linef(app, 0, 2, "S Step");
-  render_linef(app, 0, 3, "R Reverse");
-  render_linef(app, 0, 4, "C Recentre");
+  render_linef(app, 0, 2, "Scale: %.1f", app->scale);
+  render_linef(app, 0, 3, "S Step");
+  render_linef(app, 0, 4, "R Reverse");
+  render_linef(app, 0, 5, "C Recentre");
 
   render_linef(app, 1, 0, "Time: %12.10lf", app->t);
   render_linef(app, 1, 1, "Momentum: %#8.4g", sqrt(d2((Vec2){0,0},total_momentum(app))));
-  render_linef(app, 1, 2, "Energy: %#8.4g", total_energy(app));
+  render_linef(app, 1, 2, "Energy: %#8.4f", total_energy(app));
 }
 
 void render_frame(AppState *app) {
