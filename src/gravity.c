@@ -48,7 +48,7 @@ SDL_AppResult SDL_AppInit (void **appstate, int argc, char *argv[]) {
     {0., 0.},
     1.7,
     10.,
-    {255, 255, 255, SDL_ALPHA_OPAQUE}
+    {255, 255, 0, SDL_ALPHA_OPAQUE}
   };
   app->universe[1] = (Object){
     {2., 0.},
@@ -56,7 +56,7 @@ SDL_AppResult SDL_AppInit (void **appstate, int argc, char *argv[]) {
     {0., 0.},
     0.3,
     5.,
-    {255, 255, 255, SDL_ALPHA_OPAQUE}
+    {255, 0, 255, SDL_ALPHA_OPAQUE}
   };
   app->universe[2] = (Object){
     {0., -2.},
@@ -64,7 +64,7 @@ SDL_AppResult SDL_AppInit (void **appstate, int argc, char *argv[]) {
     {0., 0.},
     0.2,
     3.,
-    {255, 255, 255, SDL_ALPHA_OPAQUE}
+    {0, 255, 255, SDL_ALPHA_OPAQUE}
   };
   // for (int i = 3; i < n_objects; i++) {
   //   universe[i] = (Object){

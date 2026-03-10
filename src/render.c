@@ -30,8 +30,8 @@ int in_rect(Vec2 pos, Vec2 rect) {
 }
 
 Vec2 frame_clip(Vec2 pos, float s, float w, float h) {
-  // project a particle outside the screen onto the edge
   s /= 2;
+  // project a particle outside the screen onto the edge
   if (pos.x > s && pos.y > s && pos.x < w-s &&  pos.y < h-s)
     return pos;
 
@@ -60,8 +60,8 @@ Vec2 frame_clip(Vec2 pos, float s, float w, float h) {
 SDL_FRect render_position(AppState *app, Object obj) {
   Vec2 pos = frame_clip(pos_to_render(app, obj.r), obj.s, app->WIDTH, app->HEIGHT);
   SDL_FRect ans;
-  ans.x = pos.x - obj.s/2;
-  ans.y = pos.y - obj.s/2;
+  ans.x = pos.x;
+  ans.y = pos.y;
   ans.w = obj.s;
   ans.h = obj.s;
 
@@ -72,13 +72,21 @@ SDL_FRect render_position(AppState *app, Object obj) {
 void render_objects(AppState *app) {
   SDL_SetRenderDrawColor(app->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 
-  SDL_FRect rects[app->n_objects] = {};
+  SDL_Vertex vertices[6 * app->n_objects] = {};
 
   loop_all(i) {
-    rects[i] = render_position(app, app->universe[i]);
+    Object me = app->universe[i];
+    SDL_FRect pos = render_position(app, me);
+    vertices[6*i+0] = (SDL_Vertex) {{pos.x-me.s/2, pos.y-me.s/2}, me.c, {0, 0}}; // top left
+    vertices[6*i+1] = (SDL_Vertex) {{pos.x-me.s/2, pos.y+me.s/2}, me.c, {0, 0}}; // bottom left
+    vertices[6*i+2] = (SDL_Vertex) {{pos.x+me.s/2, pos.y-me.s/2}, me.c, {0, 0}}; // top right
+    
+    vertices[6*i+3] = (SDL_Vertex) {{pos.x-me.s/2, pos.y+me.s/2}, me.c, {0, 0}}; // bottom left
+    vertices[6*i+4] = (SDL_Vertex) {{pos.x+me.s/2, pos.y+me.s/2}, me.c, {0, 0}}; // bottom right
+    vertices[6*i+5] = (SDL_Vertex) {{pos.x+me.s/2, pos.y-me.s/2}, me.c, {0, 0}}; // top right
   }
   
-  SDL_RenderFillRects(app->renderer, rects, app->n_objects);
+  SDL_RenderGeometry(app->renderer, NULL, vertices, 6*app->n_objects, NULL, 0);
 }
 
 void render_linef(AppState *app, int is_right_aligned, int line, const char *fmt, ...) {
@@ -119,7 +127,7 @@ void render_diagnostics(AppState *app) {
 
 void render_frame(AppState *app) {
   SDL_SetRenderDrawBlendMode(app->renderer, SDL_BLENDMODE_BLEND);
-  SDL_SetRenderDrawColor(app->renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+  SDL_SetRenderDrawColor(app->renderer, 26, 26, 26, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(app->renderer);
   
   render_objects(app);
