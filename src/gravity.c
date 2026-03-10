@@ -37,6 +37,7 @@ SDL_AppResult SDL_AppInit (void **appstate, int argc, char *argv[]) {
   app->capacity = 2 * app->n_objects;
   app->universe = SDL_calloc(sizeof *app->universe, app->capacity);
   app->gravity = 2.5;
+  app->c = 100;
   app->t = 0;
   app->dt= 0.001;
   app->scale = 100;

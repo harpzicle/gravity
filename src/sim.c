@@ -2,6 +2,12 @@
 #include "app.h"
 #include <math.h>
 
+double dot(Vec2 a, Vec2 b) {
+  return a.x * b.x + a.y * b.y;
+}
+
+static const double fudge = 1e-6;
+
 void compute_accels(AppState *app) {
   loop_all(i) {
     app->universe[i].a = (Vec2) {0., 0.};
@@ -10,7 +16,7 @@ void compute_accels(AppState *app) {
   loop_all(i) {
     for (int j = i+1; j < app->n_objects; j++) {
       Object *me = &app->universe[i], *you = &app->universe[j];
-      double recip_d = pow(d2(me->r, you->r) + 1e-6, -1.5);
+      double recip_d = pow(d2(me->r, you->r) + fudge, -1.5);
       Vec2 force = {
         app->gravity * (you->r.x - me->r.x) * recip_d,
         app->gravity * (you->r.y - me->r.y) * recip_d
@@ -19,6 +25,45 @@ void compute_accels(AppState *app) {
       you->a.x -= force.x * me->m; you->a.y -= force.y * me->m;
     }
   }
+
+  // Calculate approximate GR corrections
+  Vec2 grc[app->n_objects];
+  loop_all(i) {
+    grc[i] = (Vec2) {0, 0};
+  }
+  loop_all(i) {
+    loop_all(j) {
+      if (i == j) continue;
+      Object me = app->universe[i], you = app->universe[j];
+      Vec2 rij = (Vec2) {you.r.x - me.r.x, you.r.y - me.r.y};
+      double r2 = dot(rij, rij) + fudge;
+      double r = pow(r2, 0.5);
+      double rij_factor = 4*app->gravity*me.m/r - dot(me.v, me.v) - dot(you.v, you.v);
+      rij_factor += 4*dot(me.v, you.v) + dot(rij, you.a)/2;
+      double rv = dot(rij, you.v); rv *= rv;
+      rij_factor += 3*rv/(2*r2);
+
+      Vec2 vij = (Vec2) {you.v.x - me.v.x, you.v.y - me.v.y};
+      double vij_factor = dot(rij, (Vec2) {4*me.v.x - 3*you.v.x, 4*me.v.y - 3*you.v.y}) / r;
+
+      Vec2 acc = (Vec2) {
+        rij_factor * rij.x + vij_factor * vij.x,
+        rij_factor * rij.y + vij_factor * vij.y
+      };
+
+      acc.x *= app->gravity * you.m / (r * r2 * app->c * app->c);
+      acc.y *= app->gravity * you.m / (r * r2 * app->c * app->c);
+
+      grc[i].x += acc.x;
+      grc[i].y += acc.y;
+    }
+  }
+
+  loop_all(i) {
+    app->universe[i].a.x += grc[i].x;
+    app->universe[i].a.y += grc[i].y;
+  }
+
 }
 
 

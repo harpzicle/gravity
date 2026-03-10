@@ -22,6 +22,7 @@ typedef struct {
   unsigned n_objects;
   unsigned capacity;
   double gravity;
+  double c;
   double t;
   double dt;
   double scale;
