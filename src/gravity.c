@@ -7,12 +7,13 @@
 #include "app.h"
 #include "sim.h"
 #include "render.h"
+#include "event.h"
 
 const char* title = "Gravity Simulation";
 const char* version = "0.2";
 
 char *text_buffer;
-const int n_text_buffer = 1024;
+const int n_text_buffer = 140;
 
 SDL_AppResult SDL_AppInit (void **appstate, int argc, char *argv[]) {
   SDL_SetAppMetadata(title, version, NULL);
@@ -37,7 +38,7 @@ SDL_AppResult SDL_AppInit (void **appstate, int argc, char *argv[]) {
   app->capacity = 2 * app->n_objects;
   app->universe = SDL_calloc(sizeof *app->universe, app->capacity);
   app->gravity = 2.5;
-  app->c = 100;
+  app->c = 100000;
   app->t = 0;
   app->dt= 0.001;
   app->scale = 100;
@@ -83,85 +84,26 @@ SDL_AppResult SDL_AppInit (void **appstate, int argc, char *argv[]) {
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
   AppState *app = appstate;
 
-  if (event->type == SDL_EVENT_QUIT) {
+  switch (event->type) {
+
+  case SDL_EVENT_QUIT:
     return SDL_APP_SUCCESS;
+
+  case SDL_EVENT_KEY_DOWN:
+    return event_keydown(app, event->key);
+
+  case SDL_EVENT_MOUSE_BUTTON_DOWN:
+    return event_mousedown(app, event->button);
+
+  case SDL_EVENT_MOUSE_BUTTON_UP:
+    return event_mouseup(app, event->button);
+
+  case SDL_EVENT_MOUSE_WHEEL:
+    return event_mousewheel(app, event->wheel);
+
+  default:
+    return SDL_APP_CONTINUE;
   }
-  if (event->type == SDL_EVENT_KEY_DOWN) {
-    switch (event->key.key) {
-    
-    case SDLK_ESCAPE:
-      return SDL_APP_SUCCESS;
-    case SDLK_LEFTBRACKET:
-      app->dt /= 2;
-      break;
-    case SDLK_RIGHTBRACKET:
-      app->dt *= 2;
-      break;
-    
-    case SDLK_P:
-      app->running = !app->running;
-      break;
-
-    case SDLK_R:
-      app->dt *= -1;
-      break;
-    
-    case SDLK_S:
-      sim_update_particles(app);
-      break;
-
-    case SDLK_C:
-      sim_recenter(app);
-      break;
-
-    default:
-      break;
-    }
-  }
-  if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN && event->button.button == SDL_BUTTON_LEFT) {
-    app->running = 0;
-
-    if (app->n_objects == app->capacity) {
-      Object *temp = app->universe;
-      unsigned new_cap = app->capacity * 3 / 2;
-      app->universe = SDL_realloc(app->universe, new_cap * sizeof *app->universe);
-      if (app->universe == NULL) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "failed allocating space for new planet");
-        app->universe = temp;
-        return SDL_APP_FAILURE;
-      }
-
-      app->capacity = new_cap;
-    }
-
-    Object *new_obj = &app->universe[app->n_objects];
-
-    new_obj->r = render_to_pos(app, (Vec2) { event->button.x, event->button.y });
-    new_obj->a = (Vec2) {0, 0};
-    new_obj->m = 0.1;
-    new_obj->s = 3.;
-    new_obj->c = (SDL_FColor){255, 255, 0, SDL_ALPHA_OPAQUE}; 
-
-  }
-  if (event->type == SDL_EVENT_MOUSE_BUTTON_UP && event->button.button == SDL_BUTTON_LEFT) {
-    double vx, vy;
-    Vec2 click = pos_to_render(app, app->universe[app->n_objects].r);
-    vx = (event->button.x - click.x) / app->scale;
-    vy = (event->button.y - click.y) / app->scale;
-    app->universe[app->n_objects].v = (Vec2) {vx, vy};
-    app->n_objects++;
-  }
-
-  if (event->type == SDL_EVENT_MOUSE_WHEEL) {
-    int up = event->wheel.y * ( event->wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1 : 1 );
-    if (up > 0) {
-      app->scale *= 1.5;
-    } else if (up < 0) {
-      app->scale /= 1.5;
-    }
-  }
-  
-  return SDL_APP_CONTINUE;
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate) {
@@ -176,6 +118,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
 void SDL_AppQuit(void *appstate, SDL_AppResult result) {
   AppState *app = appstate;
+
   SDL_free(app->universe);
   SDL_free(text_buffer);
   SDL_free(app);
