@@ -36,7 +36,7 @@ clean:
 cleaner: clean
 	@rm -Recurse -ErrorAction SilentlyContinue $(BINDIR)
 
-$(TARGET): $(OBJDIR)/gravity.o $(OBJDIR)/sim.o $(OBJDIR)/render.o $(OBJDIR)/app.o $(OBJDIR)/event.o
+$(TARGET): $(OBJDIR)/gravity.o $(OBJDIR)/sim.o $(OBJDIR)/render.o $(OBJDIR)/app.o $(OBJDIR)/event.o $(OBJDIR)/colour.o
 	$(CC) -o $(BINDIR)/$(TARGET) $^ $(LIBS) $(CFLAGS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c

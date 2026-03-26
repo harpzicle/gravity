@@ -14,6 +14,7 @@ typedef struct {
   SDL_FColor c;
 } Object;
 
+
 typedef struct {
   SDL_Window *window;
   SDL_Renderer *renderer;
@@ -27,10 +28,13 @@ typedef struct {
   double dt;
   double scale;
   int running;
+  int gr;
 
   int WIDTH;
   int HEIGHT;
 } AppState;
+
+Object new_object(Vec2 r, Vec2 v, float m, float s);
 
 double total_energy(AppState *app);
 double total_mass(AppState *app);

@@ -8,9 +8,10 @@
 #include "sim.h"
 #include "render.h"
 #include "event.h"
+#include "colour.h"
 
 const char* title = "Gravity Simulation";
-const char* version = "0.2";
+const char* version = "0.3";
 
 char *text_buffer;
 const int n_text_buffer = 140;
@@ -38,36 +39,31 @@ SDL_AppResult SDL_AppInit (void **appstate, int argc, char *argv[]) {
   app->capacity = 2 * app->n_objects;
   app->universe = SDL_calloc(sizeof *app->universe, app->capacity);
   app->gravity = 2.5;
-  app->c = 100000;
+  app->c = 1000;
   app->t = 0;
   app->dt= 0.001;
   app->scale = 100;
   app->running = 1;
+  app->gr = 1;
 
-  app->universe[0] = (Object){
-    {0., 0.}, 
-    {0., 0.},
-    {0., 0.},
+  app->universe[0] = new_object(
+    (Vec2){0., 0.}, 
+    (Vec2){0., 0.},
     1.7,
-    10.,
-    {255, 255, 0, SDL_ALPHA_OPAQUE}
-  };
-  app->universe[1] = (Object){
-    {2., 0.},
-    {0., 1.1},
-    {0., 0.},
+    10.
+  );
+  app->universe[1] = new_object(
+    (Vec2){2., 0.},
+    (Vec2){0., 1.1},
     0.3,
-    5.,
-    {255, 0, 255, SDL_ALPHA_OPAQUE}
-  };
-  app->universe[2] = (Object){
-    {0., -2.},
-    {-1.6, -0.2},
-    {0., 0.},
+    5.
+  );
+  app->universe[2] = new_object(
+    (Vec2){0., -2.},
+    (Vec2){-1.6, -0.2},
     0.2,
-    3.,
-    {0, 255, 255, SDL_ALPHA_OPAQUE}
-  };
+    3.
+  );
   // for (int i = 3; i < n_objects; i++) {
   //   universe[i] = (Object){
   //     {frand(100,300),frand(320,400)},
@@ -109,7 +105,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 SDL_AppResult SDL_AppIterate(void *appstate) {
   AppState *app = appstate;
 
-  sim_update(app);
+  if (app->running) sim_update_particles(app);
 
   render_frame(app);
 
