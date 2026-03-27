@@ -32,6 +32,24 @@ SDL_AppResult event_keydown(AppState *app, SDL_KeyboardEvent *event) {
     sim_recenter(app);
     break;
 
+  case SDLK_L:
+    app->new_mass += 0.05f;
+    break;
+
+  case SDLK_J:
+    app->new_mass -= 0.05f;
+    if (app->new_mass < 0) app->new_mass = 0;
+    break;
+
+  case SDLK_I:
+    app->new_size += 0.5f;
+    break;
+
+  case SDLK_K:
+    app->new_size -= 0.5f;
+    if (app->new_size < 0.5f) app->new_size = 0.5f;
+    break;
+
   default:
     break;
   }

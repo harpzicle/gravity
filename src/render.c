@@ -119,6 +119,8 @@ void render_diagnostics(AppState *app) {
   render_linef(app, 0, 3, "S Step");
   render_linef(app, 0, 4, "R Reverse");
   render_linef(app, 0, 5, "C Recentre");
+  render_linef(app, 0, 6, "J/L Click mass: %.2f", app->new_mass);
+  render_linef(app, 0, 7, "K/I Click size: %.2f", app->new_size);
 
   render_linef(app, 1, 0, "Time: %12.10lf", app->t);
   render_linef(app, 1, 1, "Momentum: %#8.4g", sqrt(d2((Vec2){0,0},total_momentum(app))));

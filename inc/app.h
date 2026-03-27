@@ -30,6 +30,9 @@ typedef struct {
   int running;
   int gr;
 
+  float new_mass;
+  float new_size;
+
   int WIDTH;
   int HEIGHT;
 } AppState;

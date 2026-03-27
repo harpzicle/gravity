@@ -45,6 +45,8 @@ SDL_AppResult SDL_AppInit (void **appstate, int argc, char *argv[]) {
   app->scale = 100;
   app->running = 1;
   app->gr = 1;
+  app->new_mass = 0.05;
+  app->new_size = 1.5;
 
   app->universe[0] = new_object(
     (Vec2){0., 0.}, 
