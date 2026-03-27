@@ -57,13 +57,13 @@ Vec2 frame_clip(Vec2 pos, float s, float w, float h) {
   }
 }
 
-SDL_FRect render_position(AppState *app, Object obj) {
-  Vec2 pos = frame_clip(pos_to_render(app, obj.r), obj.s, app->WIDTH, app->HEIGHT);
+SDL_FRect render_position(AppState *app, Object *obj) {
+  Vec2 pos = frame_clip(pos_to_render(app, obj->r), obj->s, app->WIDTH, app->HEIGHT);
   SDL_FRect ans;
-  ans.x = pos.x;
-  ans.y = pos.y;
-  ans.w = obj.s;
-  ans.h = obj.s;
+    ans.x = pos.x;
+    ans.y = pos.y;
+    ans.w = obj->s;
+    ans.h = obj->s;
 
   return ans;
 }
@@ -76,7 +76,7 @@ void render_objects(AppState *app) {
 
   loop_all(i) {
     Object me = app->universe[i];
-    SDL_FRect pos = render_position(app, me);
+    SDL_FRect pos = render_position(app, &me);
     vertices[6*i+0] = (SDL_Vertex) {{pos.x-me.s/2, pos.y-me.s/2}, me.c, {0, 0}}; // top left
     vertices[6*i+1] = (SDL_Vertex) {{pos.x-me.s/2, pos.y+me.s/2}, me.c, {0, 0}}; // bottom left
     vertices[6*i+2] = (SDL_Vertex) {{pos.x+me.s/2, pos.y-me.s/2}, me.c, {0, 0}}; // top right
@@ -114,7 +114,7 @@ void render_diagnostics(AppState *app) {
   SDL_SetRenderDrawColor(app->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 
   render_linef(app, 0, 0, "[/] Timestep: %.2g", app->dt);
-  render_linef(app, 0, 1, "P Paused: %s", "Yes\0No" + 4*app->running);
+  render_linef(app, 0, 1, "P Paused: %s", app->running ? "Yes" : "No");
   render_linef(app, 0, 2, "Scale: %.1f", app->scale);
   render_linef(app, 0, 3, "S Step");
   render_linef(app, 0, 4, "R Reverse");

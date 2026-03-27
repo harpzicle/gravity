@@ -86,16 +86,16 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     return SDL_APP_SUCCESS;
 
   case SDL_EVENT_KEY_DOWN:
-    return event_keydown(app, event->key);
+    return event_keydown(app, &event->key);
 
   case SDL_EVENT_MOUSE_BUTTON_DOWN:
-    return event_mousedown(app, event->button);
+    return event_mousedown(app, &event->button);
 
   case SDL_EVENT_MOUSE_BUTTON_UP:
-    return event_mouseup(app, event->button);
+    return event_mouseup(app, &event->button);
 
   case SDL_EVENT_MOUSE_WHEEL:
-    return event_mousewheel(app, event->wheel);
+    return event_mousewheel(app, &event->wheel);
 
   default:
     return SDL_APP_CONTINUE;
